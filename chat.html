@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Chat - Digital Literacy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>AI Chat Assistant</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tutorials.html">Tutorials</a>
+      <a href="chat.html">AI Chat</a>
+      <a href="feedback.html">Feedback</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="chat-container">
+      <div class="chat-box" id="chat-box">
+        <div class="bot-message">Hi! I’m your Digital Literacy Assistant. How can I help you today?</div>
+      </div>
+
+      <div class="chat-controls">
+        <input type="text" id="chat-input" class="chat-input" placeholder="Type your question..." />
+        <button class="btn-send" onclick="sendMessage()">Send</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const chatInput = document.getElementById("chat-input");
+
+    async function sendMessage() {
+      const userMessage = chatInput.value.trim();
+      if (!userMessage) return;
+
+      addMessage(userMessage, "user-message");
+      chatInput.value = "";
+
+      try {
+        const response = await fetch("http://localhost:3000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await response.json();
+        addMessage(data.reply, "bot-message");
+      } catch (error) {
+        addMessage("Error: Unable to connect to server.", "bot-message");
+      }
+    }
+
+    function addMessage(message, className) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = className;
+      msgDiv.textContent = message;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    chatInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
